@@ -42,15 +42,30 @@ if use_cython:
     ext_modules = cythonize(ext_modules)
 
 if __name__ == '__main__':
-    setup(name='cyordereddict',
-          description="Cython implementation of Python's collections.OrderedDict",
-          version=VERSION,
-          license='MIT',
-          author='Stephan Hoyer',
-          author_email='shoyer@gmail.com',
-          install_requires=['cython'],
-          tests_require=['nose'],
-          url='https://github.com/shoyer/cyordereddict',
-          test_suite='nose.collector',
-          packages=['cyordereddict'],
-          ext_modules=ext_modules)
+    setup(
+        name='cyordereddict',
+        description="Cython implementation of Python's collections.OrderedDict",
+        version=VERSION,
+        license='MIT',
+        url='https://github.com/shoyer/cyordereddict',
+        author='Stephan Hoyer',
+        author_email='shoyer@gmail.com',
+        packages=['cyordereddict'],
+        ext_modules=ext_modules,
+        classifiers = [
+            'Development Status :: 3 - Alpha',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: BSD License',
+            'Operating System :: OS Independent',
+            'Programming Language :: Cython',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 2',
+            'Programming Language :: Python :: 2.7',
+            'Topic :: Scientific/Engineering',
+            'Topic :: Scientific/Engineering :: Information Analysis',
+            'Topic :: Software Development',
+            'Topic :: Software Development :: Libraries',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+            'Topic :: Utilities',
+        ],
+    )
