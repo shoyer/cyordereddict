@@ -23,24 +23,34 @@ Benchmarks:
     ``__contains__``    ``100 in ordereddict``                                   2
     ==================  =================================  =========================
 
-    Numbers larger than 1 mean cyorderedict is faster. To run yourself, use
-    ``cyordereddict.benchmark()``.
+    To run these yourself, use ``cyordereddict.benchmark()``
 
 Install:
     ``pip install cyordereddict``
 
 Dependencies:
-    cyorderedict is written with Cython, but requires no dependecies other than
-    CPython and a C compiler.
+    CPython and a C compiler. Cython is only required for the dev version.
 
 Use:
     .. code-block:: python
 
-        try:
-            from cyordereddict import OrderedDict
-        except ImportError:
-            from collections import OrderedDict
+        from cyordereddict import OrderedDict
+
+Cavaets:
+    ``cyorderedddict.OrderedDict`` is an extension type (like the built-in
+    ``dict``) instead of a Python class. This means that in a few pathological
+    cases its behavior will defer from ``collections.OrderedDict``:
+
+    * The ``inspect`` module does not work on ``cyorderedddict.OrderedDict``
+      methods.
+    * Extension types use slots intead of dictionariess, so you cannot add
+      custom attributes without making a subclass (e.g.,
+      ``OrderedDict.foo = 'bar'`` will fail).
+
+    You can do anything else you might do with an OrderedDict, including making
+    subclasses: everything else passes the ``collections.OrderedDict`` test
+    suite.
 
 License:
     MIT. cyordereddict is largely adapted from the Python standard library,
-    which is available under the Python Software Foundation License.
+    which uses the Python Software Foundation License.
