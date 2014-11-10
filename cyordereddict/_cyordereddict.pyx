@@ -1,5 +1,24 @@
+from collections import MutableMapping, KeysView, ValuesView, ItemsView
 
-class OrderedDict(dict):
+from operator import itemgetter as _itemgetter, eq as _eq
+from keyword import iskeyword as _iskeyword
+import sys as _sys
+import heapq as _heapq
+from itertools import repeat as _repeat, chain as _chain, starmap as _starmap
+from itertools import imap as _imap
+
+try:
+    from thread import get_ident as _get_ident
+except ImportError:
+    from dummy_thread import get_ident as _get_ident
+
+
+cdef dict_delitem = dict.__delitem__
+cdef dict_setitem = dict.__setitem__
+cdef _repr_running = {}
+
+
+cdef class OrderedDict(dict):
     'Dictionary that remembers insertion order'
     # An inherited dict maps keys to values.
     # The inherited dict provides __getitem__, __len__, __contains__, and get.
@@ -11,6 +30,19 @@ class OrderedDict(dict):
     # The sentinel element never gets deleted (this simplifies the algorithm).
     # Each link is stored as a list of length three:  [PREV, NEXT, KEY].
 
+    cdef dict __map, __fake_dict__
+    cdef list __root
+
+    property __dict__:
+        def __get__(self):
+            if not self.__fake_dict__:
+                self.__fake_dict__ =  {'_OrderedDict__root': self.__root,
+                                       '_OrderedDict__map': self.__map}
+            return self.__fake_dict__
+
+        def __set__(self, value):
+            self.__fake_dict__ = value
+
     def __init__(self, *args, **kwds):
         '''Initialize an ordered dictionary.  The signature is the same as
         regular dictionaries, but keyword arguments are not recommended because
@@ -18,15 +50,13 @@ class OrderedDict(dict):
         '''
         if len(args) > 1:
             raise TypeError('expected at most 1 arguments, got %d' % len(args))
-        try:
-            self.__root
-        except AttributeError:
+        if self.__root is None:
             self.__root = root = []                     # sentinel node
             root[:] = [root, root, None]
             self.__map = {}
         self.__update(*args, **kwds)
 
-    def __setitem__(self, key, value, dict_setitem=dict.__setitem__):
+    def __setitem__(self, key, value):
         'od.__setitem__(i, y) <==> od[i]=y'
         # Setting a new item creates a new link at the end of the linked list,
         # and the inherited dictionary is updated with the new key/value pair.
@@ -34,9 +64,9 @@ class OrderedDict(dict):
             root = self.__root
             last = root[0]
             last[1] = root[0] = self.__map[key] = [last, root, key]
-        return dict_setitem(self, key, value)
+        dict_setitem(self, key, value)
 
-    def __delitem__(self, key, dict_delitem=dict.__delitem__):
+    def __delitem__(self, key):
         'od.__delitem__(y) <==> del od[y]'
         # Deleting an existing item uses self.__map to find the link which gets
         # removed by updating the links in the predecessor and successor nodes.
@@ -134,7 +164,7 @@ class OrderedDict(dict):
         value = self.pop(key)
         return key, value
 
-    def __repr__(self, _repr_running={}):
+    def __repr__(self):
         'od.__repr__() <==> repr(od)'
         call_key = id(self), _get_ident()
         if call_key in _repr_running:
@@ -171,7 +201,7 @@ class OrderedDict(dict):
             self[key] = value
         return self
 
-    def __eq__(self, other):
+    def _eq__(self, other):
         '''od.__eq__(y) <==> od==y.  Comparison to another OD is order-sensitive
         while comparison to a regular mapping is order-insensitive.
         '''
@@ -179,9 +209,23 @@ class OrderedDict(dict):
             return dict.__eq__(self, other) and all(_imap(_eq, self, other))
         return dict.__eq__(self, other)
 
-    def __ne__(self, other):
+    def _ne__(self, other):
         'od.__ne__(y) <==> od!=y'
         return not self == other
+
+    def __richcmp__(self, other, int op):
+        if op == 2:
+            return self._eq__(other)
+        if op == 3:
+            return self._ne__(other)
+        if op == 0:
+            return dict.__lt__(self, other)
+        if op == 4:
+            return dict.__gt__(self, other)
+        if op == 1:
+            return dict.__le__(self, other)
+        if op == 5:
+            return dict.__ge__(self, other)
 
     # -- the following methods support python 3.x style dictionary views --
 
@@ -196,4 +240,3 @@ class OrderedDict(dict):
     def viewitems(self):
         "od.viewitems() -> a set-like object providing a view on od's items"
         return ItemsView(self)
-

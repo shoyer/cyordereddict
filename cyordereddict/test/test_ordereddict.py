@@ -1,3 +1,13 @@
+import unittest
+import inspect
+import pickle, copy
+from random import shuffle
+from collections import MutableMapping
+
+from cyordereddict import OrderedDict
+import _mapping_tests as mapping_tests
+
+
 class TestOrderedDict(unittest.TestCase):
 
     def test_init(self):
@@ -10,9 +20,11 @@ class TestOrderedDict(unittest.TestCase):
         self.assertEqual(list(OrderedDict([('a', 1), ('b', 2), ('c', 9), ('d', 4)],
                                           c=3, e=5).items()), pairs)                # mixed input
 
+        # cyordereddict: remove this test because slot wrappers (on extension
+        # types) cannot be inspected
         # make sure no positional args conflict with possible kwdargs
-        self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
-                         ['self'])
+        # self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
+        #                  ['self'])
 
         # Make sure that direct calls to __init__ do not clear previous contents
         d = OrderedDict([('a', 1), ('b', 2), ('c', 3), ('d', 44), ('e', 55)])
@@ -187,8 +199,10 @@ class TestOrderedDict(unittest.TestCase):
         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
         od = OrderedDict(pairs)
         self.assertEqual(len(od.__reduce__()), 2)
-        od.x = 10
-        self.assertEqual(len(od.__reduce__()), 3)
+        # cyordereddict: remove this test because extension types don't allow
+        # assigning arbitrary attributes
+        # od.x = 10
+        # self.assertEqual(len(od.__reduce__()), 3)
 
     def test_repr(self):
         od = OrderedDict([('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)])
