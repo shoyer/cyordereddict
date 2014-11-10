@@ -1,3 +1,4 @@
+# directly copied from Lib/test/test_collections.py on Python 2.7
 import unittest
 import inspect
 import pickle, copy
