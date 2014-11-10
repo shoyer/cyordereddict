@@ -38,8 +38,9 @@ Use:
 
 Cavaets:
     ``cyorderedddict.OrderedDict`` is an extension type (like the built-in
-    ``dict``) instead of a Python class. This means that in a few pathological
-    cases its behavior will defer from ``collections.OrderedDict``:
+    ``dict``) instead of a Python class. This is necessary for speed, but means
+    that in a few pathological cases its behavior will defer from
+    ``collections.OrderedDict``:
 
     * The ``inspect`` module does not work on ``cyorderedddict.OrderedDict``
       methods.
@@ -47,8 +48,8 @@ Cavaets:
       custom attributes without making a subclass (e.g.,
       ``OrderedDict.foo = 'bar'`` will fail).
 
-    You can do anything else you might do with an OrderedDict, including making
-    subclasses: everything else passes the ``collections.OrderedDict`` test
+    You can do anything else you might do with an OrderedDict, including
+    subclassing: everything else passes the ``collections.OrderedDict`` test
     suite.
 
 License:
