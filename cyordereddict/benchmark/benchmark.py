@@ -20,6 +20,7 @@ BENCHMARKS = [
     ('``__getitem__``', "ordereddict[100]"),
     ('``update``', "ordereddict.update(dict_data)"),
     ('``__iter__``', "list(ordereddict)"),
+    ('``items``', "ordereddict.items()"),
     ('``__contains__``', "100 in ordereddict"),
 ]
 
