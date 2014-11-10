@@ -2,6 +2,9 @@
 cyordereddict: Cython implementation of Python's collections.OrderedDict
 ========================================================================
 
+.. image:: https://travis-ci.org/shoyer/cyordereddict.svg?branch=master
+    :target: https://travis-ci.org/shoyer/cyordereddict
+
 A drop-in replacement for the standard library's ``OrderedDict`` that is
 2-3x faster. Currently only for Python 2.7.
 
