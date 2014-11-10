@@ -45,6 +45,9 @@ if __name__ == '__main__':
     setup(
         name='cyordereddict',
         description="Cython implementation of Python's collections.OrderedDict",
+        long_description=(open('README.rst').read()
+                          if os.path.exists('README.rst')
+                          else ''),
         version=VERSION,
         license='MIT',
         url='https://github.com/shoyer/cyordereddict',
