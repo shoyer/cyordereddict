@@ -12,6 +12,7 @@ try:
 except ImportError:
     from dummy_thread import get_ident as _get_ident
 
+from cpython.object cimport PyObject_RichCompare, Py_EQ, Py_NE
 
 cdef dict_delitem = dict.__delitem__
 cdef dict_setitem = dict.__setitem__
@@ -214,18 +215,11 @@ cdef class OrderedDict(dict):
         return not self == other
 
     def __richcmp__(self, other, int op):
-        if op == 2:
+        if op == Py_EQ:
             return self._eq__(other)
-        if op == 3:
+        if op == Py_NE:
             return self._ne__(other)
-        if op == 0:
-            return dict.__lt__(self, other)
-        if op == 4:
-            return dict.__gt__(self, other)
-        if op == 1:
-            return dict.__le__(self, other)
-        if op == 5:
-            return dict.__ge__(self, other)
+        return PyObject_RichCompare(id(self), id(other), op)
 
     # -- the following methods support python 3.x style dictionary views --
 
