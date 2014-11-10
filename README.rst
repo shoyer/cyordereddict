@@ -26,7 +26,7 @@ Benchmarks:
     ``cyordereddict.benchmark()``.
 
 Install:
-    ``pip install cyordereddict`` (not yet)
+    ``pip install cyordereddict``
 
 Dependencies:
     cyorderedict is written with Cython, but requires no dependecies other than
