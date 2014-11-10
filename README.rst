@@ -5,17 +5,6 @@ cyordereddict: Cython implementation of Python's collections.OrderedDict
 A drop-in replacement for the standard library's ``OrderedDict`` that is
 2-3x faster. Currently only for Python 2.7.
 
-Install:
-    ``pip install cyordereddict``
-
-Use:
-    .. code-block:: python
-
-        try:
-            from cyordereddict import OrderedDict
-        except ImportError:
-            from collections import OrderedDict
-
 Benchmarks:
     ==================  =================================  =========================
     Test                Code                                 Ratio (stdlib / cython)
@@ -32,6 +21,21 @@ Benchmarks:
 
     Numbers larger than 1 mean cyorderedict is faster. To run yourself, use
     ``cyordereddict.benchmark()``.
+
+Install:
+    ``pip install cyordereddict`` (not yet)
+
+Dependencies:
+    cyorderedict is written with Cython, but requires no dependecies other than
+    CPython and a C compiler.
+
+Use:
+    .. code-block:: python
+
+        try:
+            from cyordereddict import OrderedDict
+        except ImportError:
+            from collections import OrderedDict
 
 License:
     MIT. cyordereddict is largely adapted from the Python standard library,
