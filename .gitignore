@@ -1,4 +1,6 @@
 build
+dist
+MANIFEST
 *.egg-info
 *.c
 *.pyc

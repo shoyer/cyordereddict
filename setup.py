@@ -53,7 +53,7 @@ if __name__ == '__main__':
         url='https://github.com/shoyer/cyordereddict',
         author='Stephan Hoyer',
         author_email='shoyer@gmail.com',
-        packages=['cyordereddict'],
+        packages=['cyordereddict', 'cyordereddict.benchmark'],
         ext_modules=ext_modules,
         classifiers = [
             'Development Status :: 3 - Alpha',
