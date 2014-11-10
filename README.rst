@@ -43,7 +43,7 @@ Cavaets:
 
     * The ``inspect`` module does not work on ``cyorderedddict.OrderedDict``
       methods.
-    * Extension types use slots intead of dictionariess, so you cannot add
+    * Extension types use slots intead of dictionaries, so you cannot add
       custom attributes without making a subclass (e.g.,
       ``OrderedDict.foo = 'bar'`` will fail).
 
