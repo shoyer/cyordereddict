@@ -1,12 +1,21 @@
 # directly copied from Lib/test/test_collections.py on Python 2.7
-import unittest
+try:
+    # python 2.6
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 import inspect
 import pickle, copy
 from random import shuffle
 from collections import MutableMapping
 
 from cyordereddict import OrderedDict
-import _mapping_tests as mapping_tests
+try:
+    import _mapping_tests as mapping_tests
+except ImportError:
+    # python 2.6
+    pass
+import sys
 
 
 class TestOrderedDict(unittest.TestCase):
@@ -52,16 +61,19 @@ class TestOrderedDict(unittest.TestCase):
 
         # Issue 9137: Named argument called 'other' or 'self'
         # shouldn't be treated specially.
-        od = OrderedDict()
-        od.update(self=23)
-        self.assertEqual(list(od.items()), [('self', 23)])
-        od = OrderedDict()
-        od.update(other={})
-        self.assertEqual(list(od.items()), [('other', {})])
-        od = OrderedDict()
-        od.update(red=5, blue=6, other=7, self=8)
-        self.assertEqual(sorted(list(od.items())),
-                         [('blue', 6), ('other', 7), ('red', 5), ('self', 8)])
+        if sys.version > (2, 6):
+            # this is a MutableMapping bug for which the fix was never
+            # backported to Python 2.6
+            od = OrderedDict()
+            od.update(self=23)
+            self.assertEqual(list(od.items()), [('self', 23)])
+            od = OrderedDict()
+            od.update(other={})
+            self.assertEqual(list(od.items()), [('other', {})])
+            od = OrderedDict()
+            od.update(red=5, blue=6, other=7, self=8)
+            self.assertEqual(sorted(list(od.items())),
+                             [('blue', 6), ('other', 7), ('red', 5), ('self', 8)])
 
         # Make sure that direct calls to update do not clear previous contents
         # add that updates items are not moved to the end
@@ -262,19 +274,21 @@ class TestOrderedDict(unittest.TestCase):
         items = [('a', 1), ('c', 3), ('b', 2)]
         self.assertEqual(list(MyOD(items).items()), items)
 
-class GeneralMappingTests(mapping_tests.BasicTestMappingProtocol):
-    type2test = OrderedDict
+if sys.version > (2, 6):
 
-    def test_popitem(self):
-        d = self._empty_mapping()
-        self.assertRaises(KeyError, d.popitem)
+    class GeneralMappingTests(mapping_tests.BasicTestMappingProtocol):
+        type2test = OrderedDict
 
-class MyOrderedDict(OrderedDict):
-    pass
+        def test_popitem(self):
+            d = self._empty_mapping()
+            self.assertRaises(KeyError, d.popitem)
 
-class SubclassMappingTests(mapping_tests.BasicTestMappingProtocol):
-    type2test = MyOrderedDict
+    class MyOrderedDict(OrderedDict):
+        pass
 
-    def test_popitem(self):
-        d = self._empty_mapping()
-        self.assertRaises(KeyError, d.popitem)
+    class SubclassMappingTests(mapping_tests.BasicTestMappingProtocol):
+        type2test = MyOrderedDict
+
+        def test_popitem(self):
+            d = self._empty_mapping()
+            self.assertRaises(KeyError, d.popitem)

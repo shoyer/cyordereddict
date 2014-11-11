@@ -63,6 +63,7 @@ if __name__ == '__main__':
             'Programming Language :: Cython',
             'Programming Language :: Python',
             'Programming Language :: Python :: 2',
+            'Programming Language :: Python :: 2.6',
             'Programming Language :: Python :: 2.7',
             'Topic :: Scientific/Engineering',
             'Topic :: Scientific/Engineering :: Information Analysis',

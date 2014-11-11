@@ -6,7 +6,7 @@ cyordereddict: Cython implementation of Python's collections.OrderedDict
     :target: https://travis-ci.org/shoyer/cyordereddict
 
 A drop-in replacement for the standard library's ``OrderedDict`` that is
-2-5x faster. Currently only for Python 2.7.
+2-5x faster. Currently only for Python 2.
 
 Benchmarks:
     ==================  =================================  =========================
@@ -29,7 +29,8 @@ Install:
     ``pip install cyordereddict``
 
 Dependencies:
-    CPython and a C compiler. Cython is only required for the dev version.
+    CPython (2.6 or 2.7) and a C compiler. Cython is only required for the dev
+    version.
 
 Use:
     .. code-block:: python
