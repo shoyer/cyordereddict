@@ -5,3 +5,4 @@ MANIFEST
 *.c
 *.pyc
 *.so
+_version.py

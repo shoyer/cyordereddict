@@ -5,10 +5,16 @@ from distutils.extension import Extension
 
 # adapted from cytoolz: https://github.com/pytoolz/cytoolz/blob/master/setup.py
 
-info = {}
-filename = os.path.join('cyordereddict', '_version.py')
-exec(compile(open(filename, "rb").read(), filename, 'exec'), info)
-VERSION = info['__version__']
+VERSION = '0.1.1-dev'
+
+if sys.version_info[0] == 2:
+    base_dir = 'python2'
+elif sys.version_info[0] == 3:
+    base_dir = 'python3'
+
+filename = os.path.join(base_dir, 'cyordereddict', '_version.py')
+with open(filename, 'w') as f:
+    f.write('__version__ = %r' % VERSION)
 
 try:
     from Cython.Build import cythonize
@@ -36,7 +42,7 @@ if use_cython and not has_cython:
     use_cython = False
 
 ext = '.pyx' if use_cython else '.c'
-source = os.path.join("cyordereddict", "_cyordereddict")
+source = os.path.join(base_dir, "cyordereddict", "_cyordereddict")
 ext_modules = [Extension("cyordereddict._cyordereddict", [source + ext])]
 if use_cython:
     ext_modules = cythonize(ext_modules)
@@ -54,6 +60,7 @@ if __name__ == '__main__':
         author='Stephan Hoyer',
         author_email='shoyer@gmail.com',
         packages=['cyordereddict', 'cyordereddict.benchmark'],
+        package_dir={'': base_dir},
         ext_modules=ext_modules,
         classifiers = [
             'Development Status :: 3 - Alpha',
