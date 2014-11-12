@@ -4,6 +4,7 @@ import unittest
 from test.support import forget
 import inspect
 from collections import namedtuple
+import contextlib
 from test import mapping_tests
 import pickle, copy
 from random import shuffle
@@ -209,6 +210,11 @@ class TestOrderedDict(unittest.TestCase):
                 msg = "\ncopy: %s\nod: %s" % (dup, od)
                 self.assertIsNot(dup, od, msg)
                 self.assertEqual(dup, od)
+
+    if sys.version_info[:2] < (3, 4):
+        @contextlib.contextmanager
+        def subTest(self, label):
+            yield
 
     def test_yaml_linkage(self):
         # Verify that __reduce__ is setup in a way that supports PyYAML's dump() feature.
