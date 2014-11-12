@@ -28,10 +28,10 @@ before_install:
 
 install:
   # note: for now, install numba from source so we get fixes on master
-  - conda create --yes -n test_env python=$TRAVIS_PYTHON_VERSION nose python cython
+  - conda create --yes -n test_env python=$TRAVIS_PYTHON_VERSION nose pip python cython
   - source activate test_env
   - echo $UPDATE_ENV; $UPDATE_ENV
-  - python setup.py build_ext --inplace --with-cython
+  - pip install -e .
 
 script:
   - nosetests cyordereddict
