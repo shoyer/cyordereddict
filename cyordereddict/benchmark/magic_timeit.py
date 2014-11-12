@@ -1,10 +1,10 @@
-# Copied from Wes McKinley's vbench:
+# Modified from Wes McKinley's vbench:
 # https://github.com/pydata/vbench/blob/master/vbench/benchmark.py
 
 # Modified from IPython project, http://ipython.org
 
 
-def magic_timeit(ns, stmt, ncalls=None, repeat=3, force_ms=False):
+def magic_timeit(setup, stmt, ncalls=None, repeat=3, force_ms=False):
     """Time execution of a Python statement or expression
     Usage:\\
       %timeit [-n<N> -r<R> [-t|-c]] statement
@@ -47,21 +47,7 @@ def magic_timeit(ns, stmt, ncalls=None, repeat=3, force_ms=False):
     units = ["s", "ms", 'us', "ns"]
     scaling = [1, 1e3, 1e6, 1e9]
 
-    timefunc = timeit.default_timer
-
-    timer = timeit.Timer(timer=timefunc)
-    # this code has tight coupling to the inner workings of timeit.Timer,
-    # but is there a better way to achieve that the code stmt has access
-    # to the shell namespace?
-
-    src = timeit.template % {'stmt': timeit.reindent(stmt, 8),
-                             'setup': "pass"}
-    # Track compilation time so it can be reported if too long
-    # Minimum time above which compilation time will be reported
-    code = compile(src, "<magic-timeit>", "exec")
-
-    exec code in ns
-    timer.inner = ns["inner"]
+    timer = timeit.Timer(stmt, setup)
 
     if ncalls is None:
         # determine number so that 0.2 <= total time < 2.0

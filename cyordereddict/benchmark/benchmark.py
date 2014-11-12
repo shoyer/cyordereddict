@@ -25,16 +25,9 @@ BENCHMARKS = [
 ]
 
 
-def _setup_ns(module):
-    ns = globals().copy()
-    setup = SETUP_TEMPLATE.format(module=module)
-    exec setup in ns
-    return ns
-
-
 def _time_execution(module, code, repeat):
-    ns = _setup_ns(module)
-    result = magic_timeit(ns, code, repeat=repeat, force_ms=True)
+    setup = SETUP_TEMPLATE.format(module=module)
+    result = magic_timeit(setup, code, repeat=repeat, force_ms=True)
     return result['timing']
 
 
