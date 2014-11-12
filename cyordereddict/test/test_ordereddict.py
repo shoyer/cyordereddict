@@ -61,7 +61,7 @@ class TestOrderedDict(unittest.TestCase):
 
         # Issue 9137: Named argument called 'other' or 'self'
         # shouldn't be treated specially.
-        if sys.version > (2, 6):
+        if sys.version_info > (2, 6):
             # this is a MutableMapping bug for which the fix was never
             # backported to Python 2.6
             od = OrderedDict()
@@ -274,7 +274,7 @@ class TestOrderedDict(unittest.TestCase):
         items = [('a', 1), ('c', 3), ('b', 2)]
         self.assertEqual(list(MyOD(items).items()), items)
 
-if sys.version > (2, 6):
+if sys.version_info > (2, 6):
 
     class GeneralMappingTests(mapping_tests.BasicTestMappingProtocol):
         type2test = OrderedDict
