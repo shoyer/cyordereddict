@@ -6,11 +6,11 @@
 from collections import MutableMapping, ValuesView, KeysView, ItemsView
 from operator import eq as _eq
 import sys as _sys
-from _weakref import proxy as _proxy
 from reprlib import recursive_repr as _recursive_repr
 
 from cpython.dict cimport PyDict_Clear, PyDict_DelItem, PyDict_SetItem
 from cpython.object cimport PyObject_RichCompare, Py_EQ, Py_NE
+from cpython.weakref cimport PyWeakref_NewProxy
 
 ################################################################################
 ### OrderedDict
@@ -70,7 +70,7 @@ cdef class OrderedDict(dict):
                                        '_OrderedDict__map': self.__map}
             return self.__fake_dict__
 
-    def __init__(OrderedDict self, *args, **kwds):
+    def __init__(self, *args, **kwds):
         '''Initialize an ordered dictionary.  The signature is the same as
         regular dictionaries, but keyword arguments are not recommended because
         their insertion order is arbitrary.
@@ -79,25 +79,26 @@ cdef class OrderedDict(dict):
             raise TypeError('expected at most 1 arguments, got %d' % len(args))
         if self.__root is None:
             self.__hardroot = _Link()
-            self.__root = root = _proxy(self.__hardroot)
+            self.__root = root = PyWeakref_NewProxy(self.__hardroot, None)
             root.prev = root.next = root
             self.__map = {}
         self.__update(*args, **kwds)
 
-    def __setitem__(OrderedDict self, object key, object value):
+    def __setitem__(self, object key, object value):
         'od.__setitem__(i, y) <==> od[i]=y'
         # Setting a new item creates a new link at the end of the linked list,
         # and the inherited dictionary is updated with the new key/value pair.
+        cdef _Link link
         if key not in self:
             self.__map[key] = link = _Link()
             root = self.__root
             last = root.prev
             link.prev, link.next, link.key = last, root, key
             last.next = link
-            root.prev = _proxy(link)
+            root.prev = PyWeakref_NewProxy(link, None)
         PyDict_SetItem(self, key, value)
 
-    def __delitem__(OrderedDict self, object key):
+    def __delitem__(self, object key):
         'od.__delitem__(y) <==> del od[y]'
         # Deleting an existing item uses self.__map to find the link which gets
         # removed by updating the links in the predecessor and successor nodes.
@@ -110,7 +111,7 @@ cdef class OrderedDict(dict):
         link.prev = None
         link.next = None
 
-    def __iter__(OrderedDict self):
+    def __iter__(self):
         'od.__iter__() <==> iter(od)'
         # Traverse the linked list in order.
         root = self.__root
@@ -119,7 +120,7 @@ cdef class OrderedDict(dict):
             yield curr.key
             curr = curr.next
 
-    def __reversed__(OrderedDict self):
+    def __reversed__(self):
         'od.__reversed__() <==> reversed(od)'
         # Traverse the linked list in reverse order.
         root = self.__root
@@ -128,14 +129,14 @@ cdef class OrderedDict(dict):
             yield curr.key
             curr = curr.prev
 
-    def clear(OrderedDict self):
+    def clear(self):
         'od.clear() -> None.  Remove all items from od.'
         root = self.__root
         root.prev = root.next = root
         self.__map.clear()
         PyDict_Clear(self)
 
-    def popitem(OrderedDict self, bint last=True):
+    def popitem(self, bint last=True):
         '''od.popitem() -> (k, v), return and remove a (key, value) pair.
         Pairs are returned in LIFO order if last is true or FIFO order if false.
         '''
@@ -157,7 +158,7 @@ cdef class OrderedDict(dict):
         value = dict.pop(self, key)
         return key, value
 
-    def move_to_end(OrderedDict self, object key, object last=True):
+    def move_to_end(self, object key, object last=True):
         '''Move an existing element to the end (or beginning if last==False).
         Raises KeyError if the element does not exist.
         When last=True, acts like a fast version of self[key]=self.pop(key).
@@ -179,7 +180,7 @@ cdef class OrderedDict(dict):
             link.next = first
             root.next = first.prev = link
 
-    def __sizeof__(OrderedDict self):
+    def __sizeof__(self):
         sizeof_ = _sys.getsizeof
         n = len(self) + 1                       # number of links including root
         size = sizeof_(self.__dict__)            # instance dictionary
@@ -190,15 +191,15 @@ cdef class OrderedDict(dict):
 
     update = __update = MutableMapping.update
 
-    def keys(OrderedDict self):
+    def keys(self):
         "D.keys() -> a set-like object providing a view on D's keys"
         return _OrderedDictKeysView(self)
 
-    def items(OrderedDict self):
+    def items(self):
         "D.items() -> a set-like object providing a view on D's items"
         return _OrderedDictItemsView(self)
 
-    def values(OrderedDict self):
+    def values(self):
         "D.values() -> an object providing a view on D's values"
         return _OrderedDictValuesView(self)
 
@@ -206,7 +207,7 @@ cdef class OrderedDict(dict):
 
     __marker = object()
 
-    def pop(OrderedDict self, object key, object default=__marker):
+    def pop(self, object key, object default=__marker):
         '''od.pop(k[,d]) -> v, remove specified key and return the corresponding
         value.  If key is not found, d is returned if given, otherwise KeyError
         is raised.
@@ -219,30 +220,30 @@ cdef class OrderedDict(dict):
             raise KeyError(key)
         return default
 
-    def setdefault(OrderedDict self, object key, object default=None):
+    def setdefault(self, object key, object default=None):
         'od.setdefault(k[,d]) -> od.get(k,d), also set od[k]=d if k not in od'
         if key in self:
             return self[key]
         self[key] = default
         return default
 
-    def __repr__(OrderedDict self):
+    def __repr__(self):
         'od.__repr__() <==> repr(od)'
         return _repr__(self)
 
-    def __reduce__(OrderedDict self):
+    def __reduce__(self):
         'Return state information for pickling'
         inst_dict = vars(self).copy()
         for k in vars(OrderedDict()):
             inst_dict.pop(k, None)
         return self.__class__, (), inst_dict or None, None, iter(self.items())
 
-    def copy(OrderedDict self):
+    def copy(self):
         'od.copy() -> a shallow copy of od'
         return self.__class__(self)
 
     @classmethod
-    def fromkeys(type cls, object iterable, object value=None):
+    def fromkeys(cls, object iterable, object value=None):
         '''OD.fromkeys(S[, v]) -> New ordered dictionary with keys from S.
         If not specified, the value defaults to None.
         '''
@@ -251,7 +252,7 @@ cdef class OrderedDict(dict):
             self[key] = value
         return self
 
-    def _eq__(OrderedDict self, object other):
+    def _eq__(self, object other):
         '''od.__eq__(y) <==> od==y.  Comparison to another OD is order-sensitive
         while comparison to a regular mapping is order-insensitive.
         '''
