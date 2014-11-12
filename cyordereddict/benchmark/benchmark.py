@@ -1,9 +1,9 @@
+import sys
+
 import cyordereddict
 
 from .magic_timeit import magic_timeit
 
-
-MODULES = ['cyordereddict', 'collections']
 
 SETUP_TEMPLATE = """
 from {module} import OrderedDict
@@ -12,7 +12,7 @@ dict_data = dict(list_data)
 ordereddict = OrderedDict(dict_data)
 """
 
-BENCHMARKS = [
+BENCHMARKS = cyordereddict.OrderedDict([
     ('``__init__`` empty', 'OrderedDict()'),
     ('``__init__`` list', 'OrderedDict(list_data)'),
     ('``__init__`` dict', 'OrderedDict(dict_data)'),
@@ -22,7 +22,10 @@ BENCHMARKS = [
     ('``__iter__``', "list(ordereddict)"),
     ('``items``', "ordereddict.items()"),
     ('``__contains__``', "100 in ordereddict"),
-]
+])
+
+if sys.version_info[0] >= 3:
+    BENCHMARKS['``items``'] = 'list(%s)' % BENCHMARKS['``items``']
 
 
 def _time_execution(module, code, repeat):
@@ -33,7 +36,7 @@ def _time_execution(module, code, repeat):
 
 def _calculate_benchmarks(repeat):
     all_results = []
-    for bench_name, code in BENCHMARKS:
+    for bench_name, code in BENCHMARKS.items():
         stdlib_speed = _time_execution('collections', code, repeat)
         cy_speed = _time_execution('cyordereddict', code, repeat)
         ratio_str = '%.1f' % (stdlib_speed / cy_speed)
