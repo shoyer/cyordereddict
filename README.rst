@@ -8,6 +8,18 @@ cyordereddict
 A drop-in replacement for the Python standard library's ``OrderedDict`` that is
 2-6x faster. Uses the same code, ported to Cython.
 
+Install:
+    ``pip install cyordereddict``
+
+Dependencies:
+    CPython (2.6, 2.7, 3.3 or 3.4) and a C compiler. Cython is only required
+    for the dev version.
+
+Use:
+    .. code-block:: python
+
+        from cyordereddict import OrderedDict
+
 Benchmarks:
     Python 2.7:
 
@@ -42,18 +54,6 @@ Benchmarks:
     ==================  =================================  =========================
     To run these yourself, use ``cyordereddict.benchmark()``
 
-Install:
-    ``pip install cyordereddict``
-
-Dependencies:
-    CPython (2.6, 2.7, 3.3 or 3.4) and a C compiler. Cython is only required
-    for the dev version.
-
-Use:
-    .. code-block:: python
-
-        from cyordereddict import OrderedDict
-
 Cavaets:
     ``cyorderedddict.OrderedDict`` is an extension type (similar to the
     built-in ``dict``) instead of a Python class. This is necessary for speed,
@@ -73,5 +73,5 @@ Cavaets:
     reduce the potential for introducing new bugs.
 
 License:
-    MIT. cyordereddict is largely adapted from the Python standard library,
-    which uses the Python Software Foundation License.
+    MIT. Based on the Python standard library, which is under the Python
+    Software Foundation License.
