@@ -1,25 +1,16 @@
 # directly copie dfrom /Lib/test/test_collections.py on Python 3 master
-# this also does not work yet
 
-import unittest, doctest, operator
-from test.support import TESTFN, forget, unlink
+import unittest
+from test.support import forget
 import inspect
-from test import support
-from collections import namedtuple, Counter, OrderedDict, _count_elements
+from collections import namedtuple
 from test import mapping_tests
 import pickle, copy
-from random import randrange, shuffle
-import keyword
-import re
+from random import shuffle
 import sys
-from collections import UserDict
-from collections import ChainMap
-from collections.abc import Hashable, Iterable, Iterator
-from collections.abc import Sized, Container, Callable
-from collections.abc import Set, MutableSet
-from collections.abc import Mapping, MutableMapping, KeysView, ItemsView
-from collections.abc import Sequence, MutableSequence
-from collections.abc import ByteString
+from collections.abc import MutableMapping
+
+from cyordereddict import OrderedDict
 
 ################################################################################
 ### OrderedDict
@@ -37,9 +28,11 @@ class TestOrderedDict(unittest.TestCase):
         self.assertEqual(list(OrderedDict([('a', 1), ('b', 2), ('c', 9), ('d', 4)],
                                           c=3, e=5).items()), pairs)                # mixed input
 
+        # cyordereddict: remove this test because slot wrappers (on extension
+        # types) cannot be inspected
         # make sure no positional args conflict with possible kwdargs
-        self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
-                         ['self'])
+        # self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
+        #                  ['self'])
 
         # Make sure that direct calls to __init__ do not clear previous contents
         d = OrderedDict([('a', 1), ('b', 2), ('c', 3), ('d', 44), ('e', 55)])
@@ -231,8 +224,10 @@ class TestOrderedDict(unittest.TestCase):
         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
         od = OrderedDict(pairs)
         self.assertIsNone(od.__reduce__()[2])
-        od.x = 10
-        self.assertIsNotNone(od.__reduce__()[2])
+        # cyordereddict: remove this test because extension types don't allow
+        # assigning arbitrary attributes
+        # od.x = 10
+        # self.assertIsNotNone(od.__reduce__()[2])
 
     def test_pickle_recursive(self):
         od = OrderedDict()
