@@ -41,9 +41,6 @@ cdef class OrderedDict(dict):
                                        '_OrderedDict__map': self.__map}
             return self.__fake_dict__
 
-        def __set__(self, value):
-            self.__fake_dict__ = value
-
     def __init__(self, *args, **kwds):
         '''Initialize an ordered dictionary.  The signature is the same as
         regular dictionaries, but keyword arguments are not recommended because
