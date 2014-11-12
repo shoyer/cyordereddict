@@ -12,10 +12,9 @@ try:
 except ImportError:
     from dummy_thread import get_ident as _get_ident
 
+from cpython.dict cimport PyDict_Clear, PyDict_DelItem, PyDict_SetItem
 from cpython.object cimport PyObject_RichCompare, Py_EQ, Py_NE
 
-cdef dict_delitem = dict.__delitem__
-cdef dict_setitem = dict.__setitem__
 cdef _repr_running = {}
 
 
@@ -62,13 +61,13 @@ cdef class OrderedDict(dict):
             root = self.__root
             last = root[0]
             last[1] = root[0] = self.__map[key] = [last, root, key]
-        dict_setitem(self, key, value)
+        PyDict_SetItem(self, key, value)
 
     def __delitem__(self, key):
         'od.__delitem__(y) <==> del od[y]'
         # Deleting an existing item uses self.__map to find the link which gets
         # removed by updating the links in the predecessor and successor nodes.
-        dict_delitem(self, key)
+        PyDict_DelItem(self, key)
         link_prev, link_next, _ = self.__map.pop(key)
         link_prev[1] = link_next                        # update link_prev[NEXT]
         link_next[0] = link_prev                        # update link_next[PREV]
@@ -96,7 +95,7 @@ cdef class OrderedDict(dict):
         root = self.__root
         root[:] = [root, root, None]
         self.__map.clear()
-        dict.clear(self)
+        PyDict_Clear(self)
 
     # -- the following methods do not depend on the internal structure --
 

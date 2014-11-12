@@ -9,10 +9,8 @@ import sys as _sys
 from _weakref import proxy as _proxy
 from reprlib import recursive_repr as _recursive_repr
 
+from cpython.dict cimport PyDict_Clear, PyDict_DelItem, PyDict_SetItem
 from cpython.object cimport PyObject_RichCompare, Py_EQ, Py_NE
-
-cdef dict_delitem = dict.__delitem__
-cdef dict_setitem = dict.__setitem__
 
 ################################################################################
 ### OrderedDict
@@ -97,13 +95,13 @@ cdef class OrderedDict(dict):
             link.prev, link.next, link.key = last, root, key
             last.next = link
             root.prev = _proxy(link)
-        dict_setitem(self, key, value)
+        PyDict_SetItem(self, key, value)
 
     def __delitem__(OrderedDict self, object key):
         'od.__delitem__(y) <==> del od[y]'
         # Deleting an existing item uses self.__map to find the link which gets
         # removed by updating the links in the predecessor and successor nodes.
-        dict_delitem(self, key)
+        PyDict_DelItem(self, key)
         link = self.__map.pop(key)
         link_prev = link.prev
         link_next = link.next
@@ -135,7 +133,7 @@ cdef class OrderedDict(dict):
         root = self.__root
         root.prev = root.next = root
         self.__map.clear()
-        dict.clear(self)
+        PyDict_Clear(self)
 
     def popitem(OrderedDict self, bint last=True):
         '''od.popitem() -> (k, v), return and remove a (key, value) pair.
