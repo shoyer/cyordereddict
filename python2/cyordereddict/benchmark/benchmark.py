@@ -16,12 +16,12 @@ BENCHMARKS = cyordereddict.OrderedDict([
     ('``__init__`` empty', 'OrderedDict()'),
     ('``__init__`` list', 'OrderedDict(list_data)'),
     ('``__init__`` dict', 'OrderedDict(dict_data)'),
-    ('``__setitem__``', "ordereddict[-1] = False"),
-    ('``__getitem__``', "ordereddict[100]"),
+    ('``__setitem__``', "ordereddict[0] = 0"),
+    ('``__getitem__``', "ordereddict[0]"),
     ('``update``', "ordereddict.update(dict_data)"),
     ('``__iter__``', "list(ordereddict)"),
     ('``items``', "ordereddict.items()"),
-    ('``__contains__``', "100 in ordereddict"),
+    ('``__contains__``', "0 in ordereddict"),
 ])
 
 if sys.version_info[0] >= 3:
