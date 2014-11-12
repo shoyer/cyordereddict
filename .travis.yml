@@ -34,4 +34,4 @@ install:
   - python setup.py build_ext --inplace --with-cython
 
 script:
-  - nosetests
+  - nosetests cyordereddict

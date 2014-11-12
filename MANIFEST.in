@@ -1,0 +1,3 @@
+include LICENSE.txt README.rst
+recursive-include python2 *.py *.pyx *.c
+recursive-include python3 *.py *.pyx *.c
