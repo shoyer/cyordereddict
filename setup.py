@@ -5,7 +5,7 @@ from distutils.extension import Extension
 
 # adapted from cytoolz: https://github.com/pytoolz/cytoolz/blob/master/setup.py
 
-VERSION = '0.2-dev'
+VERSION = '0.2.1'
 
 if sys.version_info[0] == 2:
     base_dir = 'python2'
@@ -72,6 +72,9 @@ if __name__ == '__main__':
             'Programming Language :: Python :: 2',
             'Programming Language :: Python :: 2.6',
             'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
             'Topic :: Scientific/Engineering',
             'Topic :: Scientific/Engineering :: Information Analysis',
             'Topic :: Software Development',
