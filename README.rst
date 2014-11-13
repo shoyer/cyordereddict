@@ -60,7 +60,7 @@ Benchmarks:
 Cavaets:
     ``cyorderedddict.OrderedDict`` is an extension type (similar to the
     built-in ``dict``) instead of a Python class. This is necessary for speed,
-    but means that in a few pathological cases its behavior will defer from
+    but means that in a few pathological cases its behavior will differ from
     ``collections.OrderedDict``:
 
     * The ``inspect`` module does not work on ``cyorderedddict.OrderedDict``
