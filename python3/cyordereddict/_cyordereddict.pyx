@@ -9,7 +9,7 @@ import sys as _sys
 from reprlib import recursive_repr as _recursive_repr
 
 from cpython.dict cimport PyDict_Clear, PyDict_DelItem, PyDict_SetItem
-from cpython.object cimport PyObject_RichCompare, Py_EQ, Py_NE
+from cpython.object cimport Py_EQ, Py_NE
 from cpython.weakref cimport PyWeakref_NewProxy
 
 ################################################################################
@@ -265,4 +265,4 @@ cdef class OrderedDict(dict):
             return self._eq__(other)
         if op == Py_NE:
             return self._ne__(other)
-        return PyObject_RichCompare(id(self), id(other), op)
+        return NotImplemented
