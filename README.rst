@@ -5,8 +5,8 @@ cyordereddict
 .. image:: https://travis-ci.org/shoyer/cyordereddict.svg?branch=master
     :target: https://travis-ci.org/shoyer/cyordereddict
 
-A drop-in replacement for the Python standard library's ``OrderedDict`` that is
-2-6x faster. Uses the same code, ported to Cython.
+The Python standard library's ``OrderedDict`` ported to Cython. A drop-in
+replacement that is 2-6x faster.
 
 Install:
     ``pip install cyordereddict``

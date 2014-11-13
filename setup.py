@@ -5,7 +5,7 @@ from distutils.extension import Extension
 
 # adapted from cytoolz: https://github.com/pytoolz/cytoolz/blob/master/setup.py
 
-VERSION = '0.1.1-dev'
+VERSION = '0.2'
 
 if sys.version_info[0] == 2:
     base_dir = 'python2'
