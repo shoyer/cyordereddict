@@ -30,15 +30,8 @@ cdef class OrderedDict(dict):
     # The sentinel element never gets deleted (this simplifies the algorithm).
     # Each link is stored as a list of length three:  [PREV, NEXT, KEY].
 
-    cdef dict __map, __fake_dict__
+    cdef dict __map
     cdef list __root
-
-    property __dict__:
-        def __get__(self):
-            if not self.__fake_dict__:
-                self.__fake_dict__ =  {'_OrderedDict__root': self.__root,
-                                       '_OrderedDict__map': self.__map}
-            return self.__fake_dict__
 
     def __init__(self, *args, **kwds):
         '''Initialize an ordered dictionary.  The signature is the same as
@@ -177,11 +170,7 @@ cdef class OrderedDict(dict):
     def __reduce__(self):
         'Return state information for pickling'
         items = [[k, self[k]] for k in self]
-        inst_dict = vars(self).copy()
-        for k in vars(OrderedDict()):
-            inst_dict.pop(k, None)
-        if inst_dict:
-            return (self.__class__, (items,), inst_dict)
+        # no need to pickle the instance dict because it doesn't exist here
         return self.__class__, (items,)
 
     def copy(self):

@@ -60,15 +60,7 @@ cdef class OrderedDict(dict):
 
     cdef _Link __hardroot
     cdef object __root
-    cdef dict __map, __fake_dict__
-
-    property __dict__:
-        def __get__(self):
-            if not self.__fake_dict__:
-                self.__fake_dict__ =  {'_OrderedDict__hardroot': self.__hardroot,
-                                       '_OrderedDict__root': self.__root,
-                                       '_OrderedDict__map': self.__map}
-            return self.__fake_dict__
+    cdef dict __map
 
     def __init__(self, *args, **kwds):
         '''Initialize an ordered dictionary.  The signature is the same as
@@ -183,8 +175,9 @@ cdef class OrderedDict(dict):
     def __sizeof__(self):
         sizeof_ = _sys.getsizeof
         n = len(self) + 1                       # number of links including root
-        size = sizeof_(self.__dict__)            # instance dictionary
-        size += sizeof_(self.__map) * 2          # internal dict and inherited dict
+        # not relevant for extension types:
+        # size = sizeof_(self.__dict__)            # instance dictionary
+        size = sizeof_(self.__map) * 2          # internal dict and inherited dict
         size += sizeof_(self.__hardroot) * n     # link objects
         size += sizeof_(self.__root) * n         # proxy objects
         return size
@@ -233,10 +226,8 @@ cdef class OrderedDict(dict):
 
     def __reduce__(self):
         'Return state information for pickling'
-        inst_dict = vars(self).copy()
-        for k in vars(OrderedDict()):
-            inst_dict.pop(k, None)
-        return self.__class__, (), inst_dict or None, None, iter(self.items())
+        # no need to pickle the instance dict because it doesn't exist here
+        return self.__class__, (), None, None, iter(self.items())
 
     def copy(self):
         'od.copy() -> a shallow copy of od'
