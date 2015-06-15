@@ -73,7 +73,7 @@ Cavaets:
     subclassing: everything else passes the ``collections.OrderedDict`` test
     suite. We based the Cython code directly on the Python standard library,
     and thus use separate code bases for Python 2 and 3, specifically to
-    reduce the potential for introducing new bugs.
+    reduce the potential for introducing new bugs or performance regressions.
 
 License:
     MIT. Based on the Python standard library, which is under the Python
