@@ -1,3 +1,7 @@
+**This library is obsolete!** Python 3.5's ``collections.OrderedDict`` was `rewritten in C`_, and is now significantly faster than ``cyordereddict.OrderedDict`` for almost all operations.
+
+.. _rewritten in C: https://bugs.python.org/issue16991
+
 =============
 cyordereddict
 =============
