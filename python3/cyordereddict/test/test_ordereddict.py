@@ -1,21 +1,14 @@
-# directly copie dfrom /Lib/test/test_collections.py on Python 3 master
-
-import unittest
-from test.support import forget
-import inspect
-from collections import namedtuple
+# adapted from /Lib/test/test_ordered_dict.py on Python 3.4 master
 import contextlib
-from test import mapping_tests
-import pickle, copy
+import copy
+import pickle
 from random import shuffle
 import sys
-from collections.abc import MutableMapping
-
+import unittest
 from cyordereddict import OrderedDict
+from collections.abc import MutableMapping
+import _mapping_tests as mapping_tests
 
-################################################################################
-### OrderedDict
-################################################################################
 
 class TestOrderedDict(unittest.TestCase):
 
@@ -29,11 +22,12 @@ class TestOrderedDict(unittest.TestCase):
         self.assertEqual(list(OrderedDict([('a', 1), ('b', 2), ('c', 9), ('d', 4)],
                                           c=3, e=5).items()), pairs)                # mixed input
 
-        # cyordereddict: remove this test because slot wrappers (on extension
-        # types) cannot be inspected
         # make sure no positional args conflict with possible kwdargs
-        # self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
-        #                  ['self'])
+        self.assertEqual(list(OrderedDict(self=42).items()), [('self', 42)])
+        self.assertEqual(list(OrderedDict(other=42).items()), [('other', 42)])
+        self.assertRaises(TypeError, OrderedDict, 42)
+        self.assertRaises(TypeError, OrderedDict, (), ())
+        self.assertRaises(TypeError, OrderedDict.__init__)
 
         # Make sure that direct calls to __init__ do not clear previous contents
         d = OrderedDict([('a', 1), ('b', 2), ('c', 3), ('d', 44), ('e', 55)])
@@ -78,6 +72,10 @@ class TestOrderedDict(unittest.TestCase):
         self.assertEqual(list(d.items()),
             [('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7)])
 
+        self.assertRaises(TypeError, OrderedDict().update, 42)
+        self.assertRaises(TypeError, OrderedDict().update, (), ())
+        self.assertRaises(TypeError, OrderedDict.update)
+
     def test_abc(self):
         self.assertIsInstance(OrderedDict(), MutableMapping)
         self.assertTrue(issubclass(OrderedDict, MutableMapping))
@@ -116,21 +114,6 @@ class TestOrderedDict(unittest.TestCase):
         self.assertEqual(list(od.items()), pairs)
         self.assertEqual(list(reversed(od)),
                          [t[0] for t in reversed(pairs)])
-        self.assertEqual(list(reversed(od.keys())),
-                         [t[0] for t in reversed(pairs)])
-        self.assertEqual(list(reversed(od.values())),
-                         [t[1] for t in reversed(pairs)])
-        self.assertEqual(list(reversed(od.items())), list(reversed(pairs)))
-
-    def test_detect_deletion_during_iteration(self):
-        od = OrderedDict.fromkeys('abc')
-        it = iter(od)
-        key = next(it)
-        del od[key]
-        with self.assertRaises(Exception):
-            # Note, the exact exception raised is not guaranteed
-            # The only guarantee that the next() will not succeed
-            next(it)
 
     def test_popitem(self):
         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
@@ -186,35 +169,21 @@ class TestOrderedDict(unittest.TestCase):
         # and have a repr/eval round-trip
         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
         od = OrderedDict(pairs)
+        def check(dup):
+            msg = "\ncopy: %s\nod: %s" % (dup, od)
+            self.assertIsNot(dup, od, msg)
+            self.assertEqual(dup, od)
+        check(od.copy())
+        check(copy.copy(od))
+        check(copy.deepcopy(od))
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(proto=proto):
+                check(pickle.loads(pickle.dumps(od, proto)))
+        check(eval(repr(od)))
         update_test = OrderedDict()
         update_test.update(od)
-        for label, dup in [
-                    ('od.copy()', od.copy()),
-                    ('copy.copy(od)', copy.copy(od)),
-                    ('copy.deepcopy(od)', copy.deepcopy(od)),
-                    ('pickle.loads(pickle.dumps(od, 0))',
-                        pickle.loads(pickle.dumps(od, 0))),
-                    ('pickle.loads(pickle.dumps(od, 1))',
-                        pickle.loads(pickle.dumps(od, 1))),
-                    ('pickle.loads(pickle.dumps(od, 2))',
-                        pickle.loads(pickle.dumps(od, 2))),
-                    ('pickle.loads(pickle.dumps(od, 3))',
-                        pickle.loads(pickle.dumps(od, 3))),
-                    ('pickle.loads(pickle.dumps(od, -1))',
-                        pickle.loads(pickle.dumps(od, -1))),
-                    ('eval(repr(od))', eval(repr(od))),
-                    ('update_test', update_test),
-                    ('OrderedDict(od)', OrderedDict(od)),
-                    ]:
-            with self.subTest(label=label):
-                msg = "\ncopy: %s\nod: %s" % (dup, od)
-                self.assertIsNot(dup, od, msg)
-                self.assertEqual(dup, od)
-
-    if sys.version_info[:2] < (3, 4):
-        @contextlib.contextmanager
-        def subTest(self, label):
-            yield
+        check(update_test)
+        check(OrderedDict(od))
 
     def test_yaml_linkage(self):
         # Verify that __reduce__ is setup in a way that supports PyYAML's dump() feature.
