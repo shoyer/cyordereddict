@@ -19,3 +19,10 @@ class TestOrderedDict(unittest.TestCase):
                 op(self.data, {})
             with self.assertRaises(TypeError):
                 op({}, self.data)
+
+    def test_delete_while_iterating(self):
+        # regression test for GH9
+        # should not raise
+        od = cyordereddict.OrderedDict([('a', 1)])
+        for (k, v) in od.items():
+            del od[k]
