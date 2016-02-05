@@ -7,7 +7,8 @@ import sys
 import unittest
 from cyordereddict import OrderedDict
 from collections.abc import MutableMapping
-import _mapping_tests as mapping_tests
+
+import cyordereddict.test._mapping_tests as mapping_tests
 
 
 class TestOrderedDict(unittest.TestCase):
@@ -184,6 +185,12 @@ class TestOrderedDict(unittest.TestCase):
         update_test.update(od)
         check(update_test)
         check(OrderedDict(od))
+
+    # cyordereddict
+    if sys.version_info[:2] < (3, 4):
+        @contextlib.contextmanager
+        def subTest(self, *args, **kwargs):
+            yield
 
     def test_yaml_linkage(self):
         # Verify that __reduce__ is setup in a way that supports PyYAML's dump() feature.

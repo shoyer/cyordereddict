@@ -1,5 +1,6 @@
 # Based on http://conda.pydata.org/docs/travis.html
 language: python
+sudo: false # use container based build
 notifications:
   email: false
 
@@ -13,7 +14,6 @@ matrix:
   - python: 3.4
 
 before_install:
-  - sudo apt-get update
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       wget http://repo.continuum.io/miniconda/Miniconda-3.6.0-Linux-x86_64.sh -O miniconda.sh;
     else
@@ -27,7 +27,6 @@ before_install:
   - conda info -a
 
 install:
-  # note: for now, install numba from source so we get fixes on master
   - conda create --yes -n test_env python=$TRAVIS_PYTHON_VERSION nose cython
   - source activate test_env
   - echo $UPDATE_ENV; $UPDATE_ENV
